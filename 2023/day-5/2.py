@@ -1,29 +1,24 @@
-# FIXME: This is a very slow solution. I'll try to find a better one later.
-
-res = float("inf")
-
-
 def get_tuples_from_sec(s: str) -> list[tuple[int, int, int]]:
     s = s.split("\n")[1:]
     res = []
     for line in s:
-        dest, src, n = line.split()
-        res.append((int(src), int(dest), int(n)))
-    res.sort(key=lambda x: x[0])
+        dst, src, n = line.split()
+        res.append((int(src), int(dst), int(n)))
+    res.sort(key=lambda x: x[1])
     return res
 
 
-def get_metric(mapping: list[tuple[int, int, int]], prev_metric: int) -> int:
-    metric = None
-    for start, end, n in mapping:
-        if start <= prev_metric < start + n:
-            metric = end + (prev_metric - start)
+def get_prev_metric(mapping: list[tuple[int, int, int]], metric: int) -> int:
+    prev_metric = None
+    for src, dst, n in mapping:
+        if dst <= metric < dst + n:
+            prev_metric = src + (metric - dst)
             break
-        if start > prev_metric:
+        if dst > metric:
             break
-    if metric == None:
-        metric = prev_metric
-    return metric
+    if prev_metric == None:
+        prev_metric = metric
+    return prev_metric
 
 
 with open("input.txt", "r") as f:
@@ -39,6 +34,8 @@ with open("input.txt", "r") as f:
     ) = f.read().split("\n\n")
 
 seed_ranges = list(map(int, seeds_planted.split(": ")[1].split()))
+seed_ranges = [(seed_ranges[i], seed_ranges[i+1]) for i in range(0, len(seed_ranges), 2)]
+seed_ranges.sort(key=lambda x: x[0])
 
 seed_soil = get_tuples_from_sec(seed_soil)
 soil_fertiliser = get_tuples_from_sec(soil_fertiliser)
@@ -48,56 +45,23 @@ light_temp = get_tuples_from_sec(light_temp)
 temp_humidity = get_tuples_from_sec(temp_humidity)
 humidity_loc = get_tuples_from_sec(humidity_loc)
 
-from_soil = dict()
-from_fertiliser = dict()
-from_water = dict()
-from_light = dict()
-from_temp = dict()
-from_humidity = dict()
-from_loc = dict()
+loc = -1
+found = False
 
-for i in range(0, len(seed_ranges), 2):
-    print(i, "/", len(seed_ranges))
+while not found:
+    loc += 1
+    
+    humidity = get_prev_metric(humidity_loc, loc)
+    temp = get_prev_metric(temp_humidity, humidity)
+    light = get_prev_metric(light_temp, temp)
+    water = get_prev_metric(water_light, light)
+    fertiliser = get_prev_metric(fertiliser_water, water)
+    soil = get_prev_metric(soil_fertiliser, fertiliser)
+    seed = get_prev_metric(seed_soil, soil)
 
-    start_seed = seed_ranges[i]
-    num = seed_ranges[i + 1]
-    for i in range(num):
-        print("\t", i, "/", num)
+    for seed_num, n in seed_ranges:
+        if seed_num <= seed < seed_num + n:
+            found = True
+            break
 
-        seed = start_seed + i
-
-        soil = get_metric(seed_soil, seed)
-        if soil in from_soil:
-            loc = from_soil[soil]
-        else:
-            fertiliser = get_metric(soil_fertiliser, soil)
-            if fertiliser in from_fertiliser:
-                loc = from_fertiliser[fertiliser]
-            else:
-                water = get_metric(fertiliser_water, fertiliser)
-                if water in from_water:
-                    loc = from_water[water]
-                else:
-                    light = get_metric(water_light, water)
-                    if light in from_light:
-                        loc = from_light[light]
-                    else:
-                        temp = get_metric(light_temp, light)
-                        if temp in from_temp:
-                            loc = from_temp[temp]
-                        else:
-                            humidity = get_metric(temp_humidity, temp)
-                            if humidity in from_humidity:
-                                loc = from_humidity[humidity]
-                            else:
-                                loc = get_metric(humidity_loc, humidity)
-                                from_humidity[humidity] = loc
-                            from_temp[temp] = loc
-                        from_light[light] = loc
-                    from_water[water] = loc
-                from_fertiliser[fertiliser] = loc
-            from_soil[soil] = loc
-
-        res = min(res, loc)
-
-print(res)
+print(loc)

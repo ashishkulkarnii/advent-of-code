@@ -5,19 +5,19 @@ def get_tuples_from_sec(s: str) -> list[tuple[int, int, int]]:
     s = s.split("\n")[1:]
     res = []
     for line in s:
-        dest, src, n = line.split()
-        res.append((int(src), int(dest), int(n)))
+        dst, src, n = line.split()
+        res.append((int(src), int(dst), int(n)))
     res.sort(key=lambda x: x[0])
     return res
 
 
 def get_metric(mapping: list[tuple[int, int, int]], prev_metric: int) -> int:
     metric = None
-    for start, end, n in mapping:
-        if start <= prev_metric < start + n:
-            metric = end + (prev_metric - start)
+    for src, dst, n in mapping:
+        if src <= prev_metric < src + n:
+            metric = dst + (prev_metric - src)
             break
-        if start > prev_metric:
+        if src > prev_metric:
             break
     if metric == None:
         metric = prev_metric
