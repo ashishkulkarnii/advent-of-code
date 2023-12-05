@@ -36,31 +36,31 @@ with open("input.txt", "r") as f:
         humidity_loc,
     ) = f.read().split("\n\n")
 
-    seeds_planted = list(map(int, seeds_planted.split(": ")[1].split()))
+seeds_planted = list(map(int, seeds_planted.split(": ")[1].split()))
 
-    seed_soil = get_tuples_from_sec(seed_soil)
-    soil_fertiliser = get_tuples_from_sec(soil_fertiliser)
-    fertiliser_water = get_tuples_from_sec(fertiliser_water)
-    water_light = get_tuples_from_sec(water_light)
-    light_temp = get_tuples_from_sec(light_temp)
-    temp_humidity = get_tuples_from_sec(temp_humidity)
-    humidity_loc = get_tuples_from_sec(humidity_loc)
+seed_soil = get_tuples_from_sec(seed_soil)
+soil_fertiliser = get_tuples_from_sec(soil_fertiliser)
+fertiliser_water = get_tuples_from_sec(fertiliser_water)
+water_light = get_tuples_from_sec(water_light)
+light_temp = get_tuples_from_sec(light_temp)
+temp_humidity = get_tuples_from_sec(temp_humidity)
+humidity_loc = get_tuples_from_sec(humidity_loc)
 
-    for seed in seeds_planted:
-        soil = get_metric(seed_soil, seed)
+for seed in seeds_planted:
+    soil = get_metric(seed_soil, seed)
 
-        fertiliser = get_metric(soil_fertiliser, soil)
+    fertiliser = get_metric(soil_fertiliser, soil)
 
-        water = get_metric(fertiliser_water, fertiliser)
+    water = get_metric(fertiliser_water, fertiliser)
 
-        light = get_metric(water_light, water)
+    light = get_metric(water_light, water)
 
-        temp = get_metric(light_temp, light)
+    temp = get_metric(light_temp, light)
 
-        humidity = get_metric(temp_humidity, temp)
+    humidity = get_metric(temp_humidity, temp)
 
-        loc = get_metric(humidity_loc, humidity)
+    loc = get_metric(humidity_loc, humidity)
 
-        res = min(res, loc)
+    res = min(res, loc)
 
 print(res)
