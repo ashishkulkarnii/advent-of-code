@@ -41,8 +41,7 @@ for curr in currs:
         ptr += 1
     ptrs.append(ptr)
 
-print(ptrs)
-
 res = math.lcm(*ptrs)
 
 print(res)
+# LCM appears to work, but i assume the test cases were designed to generate a kind of cyclic graph that allows it to
